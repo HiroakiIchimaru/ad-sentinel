@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AD Sentinel 設定</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <img src="icons/icon-128.png" width="56" height="56" alt="" />
+        <div>
+          <h1>AD Sentinel</h1>
+          <p>広告の文面を jev で判定し、詐欺・偽警告・個人情報の要求・誇大表示・子供に不適切な表現の疑いが高い広告だけをぼかします。普通の広告はそのまま表示します。</p>
+        </div>
+      </header>
+
+      <section class="card" id="api">
+        <h2>判定エンジン(jev)</h2>
+        <p class="lead">
+          TypeSafe の APIキーを入力すると jev で判定します。未入力のあいだは<strong>簡易判定</strong>(固定キーワードの照合)で動きます。
+        </p>
+        <label class="field">
+          <span>APIキー</span>
+          <div class="row">
+            <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="TypeSafe の APIキー" />
+            <button type="button" id="toggleKey" class="ghost">表示</button>
+          </div>
+          <small>
+            キーは <a href="https://typesafe.ai" target="_blank" rel="noopener">typesafe.ai</a> でアカウントを作成し、
+            <a href="https://console.typesafe.ai/keys" target="_blank" rel="noopener">コンソールの API Keys</a> から発行できます(出力は無料、入力も低額)。
+          </small>
+        </label>
+        <label class="field">
+          <span>モデル</span>
+          <input id="model" type="text" spellcheck="false" />
+          <small>既定は <code>jev-1.13.0</code>。通常は変更不要です。</small>
+        </label>
+        <div class="actions">
+          <button type="button" id="saveKey" class="primary">保存</button>
+          <button type="button" id="testKey">接続テスト</button>
+          <button type="button" id="clearKey" class="ghost danger">キーを削除</button>
+        </div>
+        <div id="apiResult" class="result" hidden></div>
+        <p class="note">
+          入力したキーはこのブラウザの拡張機能ストレージ(<code>chrome.storage.local</code>)にだけ保存され、
+          <code>api.typesafe.ai</code> への判定リクエスト以外には使いません。Web ページ側のスクリプトからは読めません。
+        </p>
+      </section>
+
+      <section class="card" id="judge">
+        <h2>判定</h2>
+        <div class="slider">
+          <label for="blockThreshold">隠す(しきい値)</label>
+          <input id="blockThreshold" type="range" min="0.5" max="0.95" step="0.05" />
+          <output id="blockOut"></output>
+        </div>
+        <div class="slider">
+          <label for="warnThreshold">注意バッジ(しきい値)</label>
+          <input id="warnThreshold" type="range" min="0.2" max="0.9" step="0.05" />
+          <output id="warnOut"></output>
+        </div>
+        <p class="hint">確率がしきい値以上の広告を隠します。誤って隠れる広告が多いときはしきい値を上げ、見逃しが多いときは下げてください。</p>
+        <h3>対象にするカテゴリ</h3>
+        <div id="categories" class="checks"></div>
+      </section>
+
+      <section class="card" id="display">
+        <h2>表示</h2>
+        <div class="radios" id="displayModes">
+          <label><input type="radio" name="display" value="blur" /><span><b>ぼかす</b><small>広告の上にぼかしと理由を重ね、「表示する」で見られます</small></span></label>
+          <label><input type="radio" name="display" value="hide" /><span><b>隠す</b><small>広告を畳み、1行の案内に置き換えます</small></span></label>
+          <label><input type="radio" name="display" value="label" /><span><b>ラベルのみ</b><small>広告はそのまま、角に警告ラベルだけ付けます</small></span></label>
+        </div>
+        <label class="check"><input type="checkbox" id="pendingBlur" /><span>判定が終わるまで広告を薄くぼかす</span></label>
+        <label class="check"><input type="checkbox" id="showWarnBadge" /><span>注意しきい値を超えた広告に「注意」バッジを出す</span></label>
+      </section>
+
+      <section class="card" id="obstruction">
+        <h2>画面をふさぐ広告の自動ブロック</h2>
+        <p class="lead">
+          文面の判定(jev)とは別に、広告の<strong>動作</strong>を端末内で調べて即座に止めます。対象は広告枠・広告フレームとその入れ物だけで、サイト自体のヘッダーやダイアログには触れません。
+        </p>
+        <div id="obstructionKinds" class="checks"></div>
+      </section>
+
+      <section class="card" id="sites">
+        <h2>無効にするサイト</h2>
+        <p class="lead">1行に1つ。サブドメインも対象になります(例: <code>example.com</code>)。popup からも切り替えられます。</p>
+        <textarea id="disabledSites" rows="4" spellcheck="false"></textarea>
+      </section>
+
+      <section class="card" id="privacy">
+        <h2>送信される情報</h2>
+        <table>
+          <thead><tr><th>jev に送るもの</th><th>送らないもの</th></tr></thead>
+          <tbody>
+            <tr><td>広告と判定した要素内の文字(最大600文字)・画像の代替テキスト</td><td>閲覧中のページの URL・タイトル・記事本文</td></tr>
+            <tr><td>広告のリンク先の「ドメイン/パス」(先頭2段まで。クエリと ID らしき部分は除く)</td><td>入力欄・テキストエリア・編集可能領域の<strong>値</strong></td></tr>
+            <tr><td>広告の HTML の特徴(パスワード欄・カード番号欄・個人情報欄がある、カウントダウン、新しいウィンドウで開く、自動再生)</td><td>広告の HTML そのもの(クリック計測 ID などを含むため)</td></tr>
+            <tr><td></td><td>Cookie・閲覧履歴・あなたを識別する情報</td></tr>
+          </tbody>
+        </table>
+        <p class="note">
+          画面に近づいた広告だけを判定します。同じ文面の広告は7日間キャッシュ(文面のハッシュと確率のみ保存)し、再送信しません。
+          通信には通常どおり IP アドレスが伴い、「どんな広告が表示されたか」は TypeSafe に届きます。
+        </p>
+      </section>
+
+      <section class="card" id="data">
+        <h2>使用量とデータ</h2>
+        <p id="usage" class="usage">—</p>
+        <div class="actions">
+          <button type="button" id="clearCache">判定キャッシュを削除</button>
+        </div>
+      </section>
+
+      <section class="card" id="support">
+        <h2>連絡先</h2>
+        <p class="lead">
+          不具合・誤判定の報告や要望は、X(旧 Twitter)の
+          <a id="contactLink" href="https://x.com/HiroakiIchimaru" target="_blank" rel="noopener">@HiroakiIchimaru</a>
+          までお寄せください。
+        </p>
+      </section>
+
+      <footer class="foot">AD Sentinel v<span id="version"></span> · 判定: TypeSafe jev</footer>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="options.js"></script>
+  </body>
+</html>

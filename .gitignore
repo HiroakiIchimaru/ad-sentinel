@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.zip
+*.log
+.DS_Store
+# APIキーは置かない・入れない
+jev_key.txt

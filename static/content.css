@@ -1,0 +1,28 @@
+/* AD Sentinel: 広告要素に付ける状態属性の見た目(UI 本体は Shadow DOM 内) */
+[data-ks-state="pending"] {
+  filter: blur(3px) saturate(0.4) !important;
+  opacity: 0.6 !important;
+  transition: filter 0.15s ease, opacity 0.15s ease !important;
+}
+
+[data-ks-state="block"][data-ks-display="hide"] {
+  display: none !important;
+}
+
+/* 画面をふさぐ広告(全画面・固定表示)と動画広告は入れ物ごと消す */
+[data-ks-obstruct="overlay"],
+[data-ks-obstruct="sticky"],
+[data-ks-obstruct="video"] {
+  display: none !important;
+}
+
+/* 消した全画面広告がスクロールを止めていた場合に戻す */
+html[data-ks-unlock~="overflow"],
+html[data-ks-unlock~="overflow"] > body {
+  overflow: auto !important;
+}
+html[data-ks-unlock~="fixed"],
+html[data-ks-unlock~="fixed"] > body {
+  position: static !important;
+  top: auto !important;
+}
