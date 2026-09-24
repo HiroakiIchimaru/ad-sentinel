@@ -1,5 +1,5 @@
 // dist/ を Chrome ウェブストア提出用の ZIP に固める(npm run pack)
-import { readFile, rm, access } from "node:fs/promises";
+import { readFile, readdir, rm, access } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -18,11 +18,10 @@ const out = `${root}ad-sentinel-v${manifest.version}.zip`;
 await rm(out, { force: true });
 
 if (process.platform === "win32") {
-  execFileSync("powershell.exe", [
-    "-NoProfile",
-    "-Command",
-    `Compress-Archive -Path "${dist}\\*" -DestinationPath "${out}"`,
-  ]);
+  // Windows PowerShell 5.1 の Compress-Archive はパスを「\」区切りで格納し、macOS・Linux で展開すると
+  // icons/ フォルダができない(Chrome がアイコンを読めず読み込みに失敗する)。Windows 標準の bsdtar を使う
+  const tar = `${process.env.SystemRoot ?? "C:\\Windows"}\\System32\\tar.exe`;
+  execFileSync(tar, ["-a", "-c", "-f", out, ...(await readdir(dist))], { cwd: dist });
 } else {
   execFileSync("zip", ["-r", out, "."], { cwd: dist });
 }
