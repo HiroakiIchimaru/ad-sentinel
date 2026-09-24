@@ -20,7 +20,7 @@ Chrome ウェブストアでの公開は準備中です。それまでは次の�
 
 ### リリースの ZIP から
 
-1. [Releases](../../releases) から `ad-sentinel-v<version>.zip` をダウンロードし、任意のフォルダに**展開**する(展開したフォルダは削除せずに残してください)
+1. [Releases](https://github.com/HiroakiIchimaru/ad-sentinel/releases) から `ad-sentinel-v<version>.zip` をダウンロードし、任意のフォルダに**展開**する(展開したフォルダは削除せずに残してください)
 2. Chrome で `chrome://extensions` を開き、右上の「**デベロッパー モード**」をオンにする
 3. 「**パッケージ化されていない拡張機能を読み込む**」で、展開したフォルダを選ぶ
 4. 設定画面が開くので、TypeSafe の APIキーを入力して「保存」→「接続テスト」(取得方法は次項)
@@ -96,6 +96,10 @@ src/
 static/        manifest.json、HTML、CSS、アイコン
 scripts/       ビルド、アイコン生成、パッケージ化
 ```
+
+## ライセンス
+
+[MIT License](LICENSE)
 
 ## 連絡先
 
