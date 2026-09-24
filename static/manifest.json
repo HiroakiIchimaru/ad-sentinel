@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AD Sentinel — 悪質広告フィルター",
   "short_name": "AD Sentinel",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "広告の文面と HTML を jev で判定し、詐欺・偽警告・個人情報の要求・誇大表示・子供に不適切な表現の疑いが高い広告だけをぼかします。画面をふさぐ広告は自動で止めます。",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "alarms"],
