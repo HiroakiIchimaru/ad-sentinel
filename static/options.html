@@ -12,14 +12,14 @@
         <img src="icons/icon-128.png" width="56" height="56" alt="" />
         <div>
           <h1>AD Sentinel</h1>
-          <p>広告の文面を jev で判定し、詐欺・偽警告・個人情報の要求・誇大表示・子供に不適切な表現の疑いが高い広告だけをぼかします。普通の広告はそのまま表示します。</p>
+          <p>広告の文面を jev で判定し、詐欺・偽警告・個人情報の要求・誇大表示・子供に不適切な表現の疑いが高い広告だけをぼかします。文面に問題のない広告はそのまま表示しますが、画面をふさぐ広告は下の設定に従って止めます。</p>
         </div>
       </header>
 
       <section class="card" id="api">
         <h2>判定エンジン(jev)</h2>
         <p class="lead">
-          TypeSafe の APIキーを入力すると jev で判定します。未入力のあいだは<strong>簡易判定</strong>(固定キーワードの照合)で動きます。
+          TypeSafe の APIキーを入力すると jev で判定します。未入力のあいだは<strong>簡易判定</strong>(固定キーワードの照合)で動きます。簡易判定は文の意味を理解しないため、正規の広告を隠すことがあります。
         </p>
         <label class="field">
           <span>APIキー</span>
@@ -61,7 +61,7 @@
           <input id="warnThreshold" type="range" min="0.2" max="0.9" step="0.05" />
           <output id="warnOut"></output>
         </div>
-        <p class="hint">確率がしきい値以上の広告を隠します。誤って隠れる広告が多いときはしきい値を上げ、見逃しが多いときは下げてください。</p>
+        <p class="hint">確率がしきい値以上の広告を隠します。誤って隠れる広告が多いときはしきい値を上げ、見逃しが多いときは下げてください。判定は自動のため誤ることがあり、確率は疑いの強さの目安です(広告主が実際に詐欺などであることを示すものではありません)。</p>
         <h3>対象にするカテゴリ</h3>
         <div id="categories" class="checks"></div>
       </section>
@@ -105,6 +105,7 @@
         <p class="note">
           画面に近づいた広告だけを判定します。同じ文面の広告は7日間キャッシュ(文面のハッシュと確率のみ保存)し、再送信しません。
           通信には通常どおり IP アドレスが伴い、「どんな広告が表示されたか」は TypeSafe に届きます。
+          送った内容の TypeSafe での取り扱いは <a href="https://typesafe.ai/legal/privacy-policy" target="_blank" rel="noopener">TypeSafe のプライバシーポリシー</a>をご覧ください。
         </p>
       </section>
 

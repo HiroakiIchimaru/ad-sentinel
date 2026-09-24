@@ -107,7 +107,7 @@ async function init(): Promise<void> {
   const key = typeof l[API_KEY_KEY] === "string" ? (l[API_KEY_KEY] as string) : "";
   $<HTMLInputElement>("apiKey").value = key;
   fill();
-  if (!key) showResult("info", "APIキーが未設定のため、<b>簡易判定</b>(固定キーワードの照合)で動作しています。");
+  if (!key) showResult("info", "APIキーが未設定のため、<b>簡易判定</b>(固定キーワードの照合)で動作しています。文の意味を理解しないため、正規の広告を隠すことがあります。");
   void loadUsage();
 
   $("toggleKey").addEventListener("click", () => {
